@@ -6,12 +6,10 @@
 
     <groupId>org.sandag</groupId>
     <artifactId>SANDAG-ABM</artifactId>
-    <version>13.2.5</version>
+    <version>version_13_3_0</version>
     <name>SANDAG CT-RAMP Activity Based Model</name>
     <properties>
         <encoding.type>UTF-8</encoding.type> 
-        <output.path>${project.build.directory}/${project.name}/${project.version}/${project.activeProfiles[0].id}/${project.activeProfiles[1].id}</output.path>
-        <study.root>${project.build.directory}/${project.name}/${project.version}/${project.activeProfiles[0].id}</study.root>
         <release.root>${project.build.directory}/${project.name}/${project.version}</release.root>
         <jppf.driver.memory.min>1000m</jppf.driver.memory.min> 
         <jppf.driver.memory.max>9000m</jppf.driver.memory.max> 
@@ -53,101 +51,6 @@
         <jppf_version>5.0.1</jppf_version>
     </properties>
     <profiles>
-        <profile>
-            <id>local</id>
-            <properties>
-                <snode>true</snode>
-                <jppf.server.host>127.0.0.1</jppf.server.host>
-                <jppf.management.host>127.0.0.1</jppf.management.host>
-                <matrix.server.host>127.0.0.1</matrix.server.host>
-                <household.server.host>127.0.0.1</household.server.host>
-                <master.node.ip>127.0.0.1</master.node.ip>  
-                <master.node.name>localhost</master.node.name>             
-                <master.execution.threads>18</master.execution.threads>
-                <node.1.name>localhost</node.1.name>
-                <node.1.execution.threads>18</node.1.execution.threads>
-                <TRANSCAD_PATH>C:\Progra~1\TRANSC~1.0</TRANSCAD_PATH>
-            </properties>
-        </profile>
-        <profile>
-            <id>aztec</id>
-            <properties>
-                <snode>false</snode>
-                <jppf.server.host>172.16.34.30</jppf.server.host>
-                <map.folder>c$</map.folder>
-                <jppf.management.host>172.16.34.30</jppf.management.host>
-                <matrix.server.host>172.16.34.30</matrix.server.host>
-                <household.server.host>172.16.34.30</household.server.host>
-                <master.node.ip>172.16.34.30</master.node.ip>
-                <node.1.ip>172.16.34.33</node.1.ip>
-                <node.2.ip>172.16.34.45</node.2.ip>
-                <node.3.ip>172.16.34.51</node.3.ip>
-                <master.node.name>AZTEC</master.node.name>
-                <master.execution.threads>14</master.execution.threads>
-                <node.1.name>HAWKEYE</node.1.name>
-                <node.1.execution.threads>15</node.1.execution.threads>
-                <node.2.name>AGGIE</node.2.name>
-                <node.2.execution.threads>12</node.2.execution.threads>
-                <node.3.name>CHARGER</node.3.name>
-                <node.3.execution.threads>8</node.3.execution.threads>
-                <TRANSCAD_PATH>C:\Progra~1\TRANSC~1</TRANSCAD_PATH>               
-            </properties>
-        </profile>          
-        <profile>
-            <id>gaucho</id>
-            <properties>
-                <snode>false</snode>
-                <jppf.server.host>172.16.34.61</jppf.server.host>
-                <map.folder>d$</map.folder>
-                <jppf.management.host>172.16.34.61</jppf.management.host>
-                <matrix.server.host>172.16.34.61</matrix.server.host>
-                <household.server.host>172.16.34.61</household.server.host>
-                <master.node.ip>172.16.34.61</master.node.ip>
-                <node.1.ip>172.16.34.40</node.1.ip>
-                <node.2.ip>172.16.34.39</node.2.ip>
-                <master.node.name>GAUCHO</master.node.name>
-                <master.execution.threads>14</master.execution.threads>
-                <node.1.name>MUSTANG</node.1.name>
-                <node.1.execution.threads>12</node.1.execution.threads>
-                <node.2.name>NITTANY</node.2.name>
-                <node.2.execution.threads>12</node.2.execution.threads>
-                <TRANSCAD_PATH>C:\Progra~1\TRANSC~1</TRANSCAD_PATH>             
-            </properties>
-        </profile>       
-        <profile>
-            <id>wildcat</id>
-            <properties>
-                <snode>false</snode>
-                <jppf.server.host>172.16.34.60</jppf.server.host>
-                <map.folder>d$</map.folder>
-                <jppf.management.host>172.16.34.60</jppf.management.host>
-                <matrix.server.host>172.16.34.60</matrix.server.host>
-                <household.server.host>172.16.34.60</household.server.host>
-                <master.node.ip>172.16.34.60</master.node.ip>
-                <node.1.ip>172.16.34.42</node.1.ip>
-                <node.2.ip>172.16.34.41</node.2.ip>
-                <master.node.name>WILDCAT</master.node.name>
-                <master.execution.threads>14</master.execution.threads>
-                <node.1.name>GALAXIE</node.1.name>
-                <node.1.execution.threads>12</node.1.execution.threads>
-                <node.2.name>COBRA</node.2.name>
-                <node.2.execution.threads>12</node.2.execution.threads>
-                <TRANSCAD_PATH>C:\Progra~1\TRANSC~1</TRANSCAD_PATH>
-            </properties>
-        </profile>         
-        <profile>
-            <id>sdsc-cluster</id>
-            <properties>
-                <AT>False</AT>
-                <jppf.server.host></jppf.server.host>
-                <jppf.management.host></jppf.management.host>
-                <matrix.server.port></matrix.server.port>
-                <household.server.host></household.server.host>
-                <master.node.ip></master.node.ip>
-                <node.1.ip></node.1.ip>
-                <node.2.ip></node.2.ip>
-            </properties>
-        </profile>
          <profile>
             <id>2010</id>
             <activation>
@@ -188,6 +91,24 @@
             </properties>
         </profile>
         <profile>
+            <id>2014</id>
+            <properties>
+                <year>2014</year>
+                <crossBorder.tours>105433</crossBorder.tours>
+                <airport.enplanements>12666042</airport.enplanements>
+                <airport.connecting>513234</airport.connecting>
+                <airport.airportMgra>2997</airport.airportMgra>
+                <crossborder.dc.soa.alts.file>CrossBorderDestinationChoiceSoaAlternatives2015.csv</crossborder.dc.soa.alts.file>    
+                <crossBorder.dc.uec.file>CrossBorderDestinationChoice2015.xls</crossBorder.dc.uec.file>
+                <crossBorder.trip.mc.uec.file>CrossBorderTripModeChoice.xls</crossBorder.trip.mc.uec.file>
+                <tourdest.uec.file>TourDestinationChoice2010.xls</tourdest.uec.file>              
+                <workShadowPricing.iteration>ShadowPricingOutput_work_19.csv</workShadowPricing.iteration>
+                <schoolShadowPricing.iteration>ShadowPricingOutput_school_19.csv</schoolShadowPricing.iteration>
+                <aoc.fuel>12.9</aoc.fuel>
+                <aoc.maintenance>6.3</aoc.maintenance>
+            </properties>
+        </profile>
+        <profile>
             <id>2015</id>
             <properties>
                 <year>2015</year>
@@ -203,6 +124,42 @@
                 <schoolShadowPricing.iteration>ShadowPricingOutput_school_19.csv</schoolShadowPricing.iteration>
                 <aoc.fuel>19.5</aoc.fuel>
                 <aoc.maintenance>6.2</aoc.maintenance>
+            </properties>
+        </profile>
+        <profile>
+            <id>2016</id>
+            <properties>
+                <year>2016</year>
+                <crossBorder.tours>101478</crossBorder.tours>
+                <airport.enplanements>12339408</airport.enplanements>
+                <airport.connecting>499999</airport.connecting>
+                <airport.airportMgra>2997</airport.airportMgra>
+                <crossborder.dc.soa.alts.file>CrossBorderDestinationChoiceSoaAlternatives2015.csv</crossborder.dc.soa.alts.file>    
+                <crossBorder.dc.uec.file>CrossBorderDestinationChoice2015.xls</crossBorder.dc.uec.file>
+                <crossBorder.trip.mc.uec.file>CrossBorderTripModeChoice.xls</crossBorder.trip.mc.uec.file>
+                <tourdest.uec.file>TourDestinationChoice2010.xls</tourdest.uec.file>              
+                <workShadowPricing.iteration>ShadowPricingOutput_work_19.csv</workShadowPricing.iteration>
+                <schoolShadowPricing.iteration>ShadowPricingOutput_school_19.csv</schoolShadowPricing.iteration>
+                <aoc.fuel>15.3</aoc.fuel>
+                <aoc.maintenance>6.6</aoc.maintenance>
+            </properties>
+        </profile>
+        <profile>
+            <id>2017</id>
+            <properties>
+                <year>2017</year>
+                <crossBorder.tours>101478</crossBorder.tours>
+                <airport.enplanements>12339408</airport.enplanements>
+                <airport.connecting>499999</airport.connecting>
+                <airport.airportMgra>2997</airport.airportMgra>
+                <crossborder.dc.soa.alts.file>CrossBorderDestinationChoiceSoaAlternatives2015.csv</crossborder.dc.soa.alts.file>    
+                <crossBorder.dc.uec.file>CrossBorderDestinationChoice2015.xls</crossBorder.dc.uec.file>
+                <crossBorder.trip.mc.uec.file>CrossBorderTripModeChoice.xls</crossBorder.trip.mc.uec.file>
+                <tourdest.uec.file>TourDestinationChoice2010.xls</tourdest.uec.file>              
+                <workShadowPricing.iteration>ShadowPricingOutput_work_19.csv</workShadowPricing.iteration>
+                <schoolShadowPricing.iteration>ShadowPricingOutput_school_19.csv</schoolShadowPricing.iteration>
+                <aoc.fuel>15.3</aoc.fuel>
+                <aoc.maintenance>6.6</aoc.maintenance>
             </properties>
         </profile>
         <profile>
@@ -242,6 +199,24 @@
             </properties>
         </profile>
         <profile>
+            <id>2030</id>
+            <properties>
+                <year>2030</year>
+                <crossBorder.tours>119999</crossBorder.tours>
+                <airport.enplanements>13788822</airport.enplanements>
+                <airport.connecting>558730</airport.connecting>
+                <airport.airportMgra>2997</airport.airportMgra>
+                <crossborder.dc.soa.alts.file>CrossBorderDestinationChoiceSoaAlternatives2015.csv</crossborder.dc.soa.alts.file>    
+                <crossBorder.dc.uec.file>CrossBorderDestinationChoice2015.xls</crossBorder.dc.uec.file>
+                <crossBorder.trip.mc.uec.file>CrossBorderTripModeChoice_OME.xls</crossBorder.trip.mc.uec.file>
+                <tourdest.uec.file>TourDestinationChoice2020.xls</tourdest.uec.file>                   
+                <workShadowPricing.iteration>ShadowPricingOutput_work_19.csv</workShadowPricing.iteration>
+                <schoolShadowPricing.iteration>ShadowPricingOutput_school_19.csv</schoolShadowPricing.iteration>
+                <aoc.fuel>17.3</aoc.fuel>
+                <aoc.maintenance>8.2</aoc.maintenance>
+            </properties>
+        </profile>
+        <profile>
             <id>2035</id>
             <properties>
                 <year>2035</year>
@@ -266,6 +241,24 @@
                 <crossBorder.tours>134961</crossBorder.tours>
                 <airport.enplanements>14442527</airport.enplanements>
                 <airport.connecting>585218</airport.connecting>
+                <airport.airportMgra>2997</airport.airportMgra>
+                <crossborder.dc.soa.alts.file>CrossBorderDestinationChoiceSoaAlternatives2040.csv</crossborder.dc.soa.alts.file>    
+                <crossBorder.dc.uec.file>CrossBorderDestinationChoice2040.xls</crossBorder.dc.uec.file>
+                <crossBorder.trip.mc.uec.file>CrossBorderTripModeChoice_OME.xls</crossBorder.trip.mc.uec.file>
+                <tourdest.uec.file>TourDestinationChoice2035.xls</tourdest.uec.file>      
+                <workShadowPricing.iteration>ShadowPricingOutput_work_19.csv</workShadowPricing.iteration>
+                <schoolShadowPricing.iteration>ShadowPricingOutput_school_19.csv</schoolShadowPricing.iteration>
+                <aoc.fuel>19.4</aoc.fuel>
+                <aoc.maintenance>8.8</aoc.maintenance>
+            </properties>
+        </profile>
+        <profile>
+            <id>2045</id>
+            <properties>
+                <year>2045</year>
+                <crossBorder.tours>135696</crossBorder.tours>
+                <airport.enplanements>14770717</airport.enplanements>
+                <airport.connecting>598517</airport.connecting>
                 <airport.airportMgra>2997</airport.airportMgra>
                 <crossborder.dc.soa.alts.file>CrossBorderDestinationChoiceSoaAlternatives2040.csv</crossborder.dc.soa.alts.file>    
                 <crossBorder.dc.uec.file>CrossBorderDestinationChoice2040.xls</crossBorder.dc.uec.file>
@@ -362,6 +355,23 @@
                 </configuration>
             </plugin>
             <plugin>
+	            <groupId>org.codehaus.mojo</groupId>
+	            <artifactId>exec-maven-plugin</artifactId>
+	            <version>1.2</version>
+	            <executions>
+	              <execution>
+	                <id>runbatchfile</id>
+	                <phase>package</phase>
+	                <goals>
+	                  <goal>exec</goal>
+	                </goals>
+	              </execution>
+	            </executions>
+	            <configuration>
+	              <executable>src/main/resources/setup.bat</executable>
+	            </configuration>
+	        </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.8</version>
@@ -414,9 +424,6 @@
                         </goals>
                         <configuration>
                             <encoding>${encoding.type}</encoding>
-                            <!-- 
-                            <outputDirectory>${study.root}/gisdk</outputDirectory>
-                            -->
                             <outputDirectory>${release.root}/common/gisdk</outputDirectory>
                             <resources>
                                 <resource>
@@ -434,6 +441,22 @@
                         </goals>
                         <configuration>
                             <encoding>${encoding.type}</encoding>
+                            <outputDirectory>${project.build.directory}/${project.name}/dist</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>/dist</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution> 
+                    <execution>
+                        <id>copy-distribution-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <encoding>${encoding.type}</encoding>
                             <outputDirectory>${release.root}/common/python</outputDirectory>
                             <resources>
                                 <resource>
@@ -442,7 +465,7 @@
                                 </resource>
                             </resources>
                         </configuration>
-                    </execution>                   
+                    </execution>                    
                     <execution>
                         <id>copy-txt-resources</id>
                         <phase>package</phase>
@@ -451,7 +474,7 @@
                         </goals>
                         <configuration>
                             <encoding>${encoding.type}</encoding>
-                            <outputDirectory>${study.root}</outputDirectory>
+                            <outputDirectory>${release.root}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/resources</directory>
@@ -471,7 +494,7 @@
                         </goals>
                         <configuration>
                             <encoding>${encoding.type}</encoding>
-                            <outputDirectory>${output.path}/conf</outputDirectory>
+                            <outputDirectory>${release.root}/conf/${project.activeProfiles[0].id}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/resources</directory>
@@ -479,6 +502,7 @@
                                     <includes>
                                         <include>**/*.properties</include>
                                         <include>*.xml</include>
+                                        <include>*.csv</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -492,7 +516,7 @@
                         </goals>
                         <configuration>
                             <encoding>${encoding.type}</encoding>
-                            <outputDirectory>${output.path}/bin</outputDirectory>
+                            <outputDirectory>${release.root}/common/bin</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/resources</directory>
@@ -540,7 +564,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${output.path}/bin</outputDirectory>
+                            <outputDirectory>${release.root}/common/bin</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/resources</directory>
@@ -722,8 +746,30 @@
             <artifactId>jppf-server</artifactId>
             <version>${jppf_version}</version>
         </dependency>
-    </dependencies>
-
+        <dependency>
+	    <groupId>com.linuxense</groupId>
+	    	<artifactId>javadbf</artifactId>
+	    <version>0.4.0</version>
+	    </dependency>
+        <dependency>
+         <groupId>osplanning</groupId>
+        	<artifactId>omx</artifactId>
+			<version>0.2.3</version>
+		</dependency>
+	    <dependency>	
+		  <groupId>hdf</groupId>
+            <artifactId>jhi</artifactId>
+            <version>5.0</version>
+            <type>dll</type>
+        </dependency>
+        <dependency>
+          <groupId>hdf</groupId>
+            <artifactId>jhi</artifactId>
+            <version>4.0</version>
+            <type>dll</type>
+        </dependency>
+	</dependencies>
+	
     <distributionManagement>
         <snapshotRepository>
             <id>nexus-snapshots</id>

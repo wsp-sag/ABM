@@ -38,7 +38,6 @@ if sb375 not in {'On', 'Off'}:
     
 saveLocation = sys.argv[4]
 
-#conn = _mssql.connect(server='pele', user='emfac', password='3mf@c', database='abm_sd')
 conn = pyodbc.connect(driver='{SQL Server}', server='sql2014a8', database='abm_13_2_3',trusted_connection='yes')
 cursor = conn.cursor()
 
@@ -93,7 +92,7 @@ sheet_scen_vmt.cell(row = 0, column = 4).value = 'Veh_Tech'
 sheet_scen_vmt.cell(row = 0, column = 5).value = 'New Total VMT'
 
 print 'Querying VMT records'
-query = 'SELECT * FROM [ws].[emfac].[FN_EMFAC_2014_VMT] (?) order by Veh_Tech'
+query = 'SELECT * FROM [emfac].[FN_EMFAC_2014_VMT] (?) order by Veh_Tech'
 cursor.execute(query,   scenario_id)
 rows = cursor.fetchall()
 
@@ -137,7 +136,7 @@ sheet_scen_speed.cell(row = 0, column = 23).value = '90mph'
 
 counter = 1
 
-query = 'SELECT * FROM ws.emfac.FN_EMFAC_2014_VMT_SPEED (?) ORDER BY Veh_Tech, Hour'
+query = 'SELECT * FROM emfac.FN_EMFAC_2014_VMT_SPEED (?) ORDER BY Veh_Tech, Hour'
 print 'Querying VMT Speed records'
 cursor.execute(query, scenario_id)
 rows = cursor.fetchall()
