@@ -21,7 +21,7 @@ class CreateScenarioGUI(Tkinter.Frame):
             Tkinter.Label(body, text=u"Version", font=("Helvetica", 8, 'bold')).grid(row=0)
             var = StringVar(root)
             self.version="version_13_3_0"
-            optionList=["version_13_3_0", "version_13_3_1_SNAPSHOT"]
+            optionList=["version_13_3_0", "version_13_3_1"]
             option=Tkinter.OptionMenu(body,var,*optionList,command=self.setversion)
             option.config(width=50)
             option.grid(row=0, column=1)
@@ -119,7 +119,7 @@ class CreateScenarioGUI(Tkinter.Frame):
         def checkPath(self):
             self.popup=Tkinter.Tk()
             if os.path.exists(self.scenariopath.get()):
-                popupMsg.popupmsg(self,"Selected scenario folder already exists! Proceeding will overwrite existing files!",2)
+                popupMsg.popupmsg(self,"Selected scenario folder already exists! Proceeding will overwrite existing files!",2,"scenario")
             elif not self.scenariopath.get():
                 popupMsg.popupmsg(self,"Scenario is empty!",1)
             else:
@@ -127,14 +127,14 @@ class CreateScenarioGUI(Tkinter.Frame):
             return
 
         #run batch
-        def executeBatch(self):
+        def executeBatch(self,type):
             self.popup.destroy()
             commandstr=u"create_scenario.cmd "+self.scenariopath.get()+" "+self.year+" "+self.networkpath.get()
             print commandstr
             os.chdir('T:/ABM/release/ABM/'+self.version+'/')
             os.system(commandstr)
             self.popup=Tkinter.Tk()
-            popupMsg.popupmsg(self,"You have successfully created the scenario!",1)
+            popupMsg.popupmsg(self,"You have successfully created the scenario!",1, type)
             return
 
 root = Tkinter.Tk()

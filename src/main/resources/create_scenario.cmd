@@ -13,6 +13,9 @@ set FOLDERS=input application bin conf gisdk input_truck logFiles output python 
 for %%i in (%FOLDERS%) do (
 md %SCENARIO_FOLDER%\%%i)
 
+#grant full permissions to scenario folder
+cacls %SCENARIO_FOLDER% /t /e /g Everyone:f
+
 xcopy /Y .\common\application\"*.*" %SCENARIO_FOLDER%\application
 xcopy /Y .\common\input_truck\"*.*" %SCENARIO_FOLDER%\input_truck
 xcopy /Y/E .\common\python\"*.*" %SCENARIO_FOLDER%\python
@@ -22,6 +25,7 @@ xcopy /Y .\common\gisdk\"*.*" %SCENARIO_FOLDER%\gisdk
 xcopy /Y .\common\bin\"*.*" %SCENARIO_FOLDER%\bin
 xcopy /Y .\conf\%YEAR%\"*.*" %SCENARIO_FOLDER%\conf
 xcopy /Y .\"*.txt" %SCENARIO_FOLDER%
+xcopy /Y .\common\output\"*.*" %SCENARIO_FOLDER%\output
 
 @echo copy year specific folders
 del %SCENARIO_FOLDER%\input /q
