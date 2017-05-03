@@ -1,5 +1,6 @@
 __author__ = 'wsu'
 #Wu.Sun@sandag.org 10-27-2016
+#wsu update 5/2/2017 for release 13.3.2
 import Tkinter
 import Tkconstants
 import tkFileDialog
@@ -20,13 +21,13 @@ class CreateScenarioGUI(Tkinter.Frame):
             divider=u"_"*120
             self.releaseDir='T:\\ABM\\release\\ABM'
             self.defaultScenarioDir="T:\\projects\\sr13"
-            self.defaultNetworkDir="T:\\projects\\sr13\\version13_3_1\\network_build"
+            self.defaultNetworkDir="T:\\projects\\sr13\\version13_3_2\\network_build"
 
             self.buttonVar= IntVar(root)
             self.yButton=Radiobutton(body, text="Yes", variable=self.buttonVar, value=1, command=self.initStudy)
             self.nButton=Radiobutton(body, text="No", variable=self.buttonVar, value=0,command=self.initStudy)
             Tkinter.Label(body, text=divider, font=("Helvetica", 11, 'bold'), width=50, fg='royal blue').grid(row=0,columnspan=5)
-            Tkinter.Label(body, text=u"Create an ABM Space", font=("Helvetica", 10, 'bold')).grid(row=1,columnspan=3)
+            Tkinter.Label(body, text=u"Create an ABM Work Space", font=("Helvetica", 10, 'bold')).grid(row=1,columnspan=3)
             self.yButton.grid(row=2,column=0, columnspan=2)
             self.nButton.grid(row=2,column=1, columnspan=2)
 
@@ -54,8 +55,8 @@ class CreateScenarioGUI(Tkinter.Frame):
 
             Tkinter.Label(body, text=u"Version", font=("Helvetica", 8, 'bold')).grid(row=8)
             var = StringVar(root)
-            self.version="version_13_3_1"
-            optionList=["version_13_3_0", "version_13_3_1"]
+            self.version="version_13_3_2"
+            optionList=["version_13_3_0", "version_13_3_1", "version_13_3_2"]
             option=Tkinter.OptionMenu(body,var,*optionList,command=self.setversion)
             option.config(width=50)
             option.grid(row=8, column=1)
