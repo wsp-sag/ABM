@@ -1,0 +1,54 @@
+---
+title: "Make Splines"
+output: html_notebook
+---
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("lspline", 
+                     "tidyverse")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I-O
+```{r remote-io}
+test_file_name <- "test.csv"
+
+```
+
+# Parameters
+```{r parameters}
+
+```
+
+# Data Reads
+```{r data-reads}
+test_df <- read_csv(test_file_name, col_types = "dd")
+
+```
+
+# Splines
+```{r spline}
+knots_vector <- c(0.5, 1, 2, 3, 5, 10, 20, 30, 50)
+
+model_01 <- lm(test_df$Impedance ~ lspline(test_df$Distance, knots_vector))
+
+outcomes_df <- bind_cols(test_df, tibble(predict = predict(model_01, test_df)))
+
+coeffs_df <- tibble(coeffs = coefficients(model_01))
+```
+
+# Write
+```{r write}
+write_csv(outcomes_df, path = "outcomes.csv")
+```
+
+

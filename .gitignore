@@ -32,3 +32,6 @@ src/main/python/reporting/abm_reports*/*
 **/bin/**/*
 *.user
 *.pyc
+.Rproj.user
+.DS_Store
+src/scripts/.Rhistory
