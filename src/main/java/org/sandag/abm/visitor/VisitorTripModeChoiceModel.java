@@ -49,7 +49,7 @@ public class VisitorTripModeChoiceModel
      * @param myLogsumHelper
      */
     public VisitorTripModeChoiceModel(HashMap<String, String> propertyMap,
-            VisitorModelStructure myModelStructure, VisitorDmuFactoryIf dmuFactory)
+            VisitorModelStructure myModelStructure, VisitorDmuFactoryIf dmuFactory, AutoTazSkimsCalculator tazDistanceCalculator)
     {
         tazs = TazDataManager.getInstance(propertyMap);
         mgraManager = MgraDataManager.getInstance(propertyMap);
@@ -59,8 +59,7 @@ public class VisitorTripModeChoiceModel
         lsWgtAvgCostH = mgraManager.getLsWgtAvgCostH();
 
         modelStructure = myModelStructure;
-        tazDistanceCalculator = new AutoTazSkimsCalculator(propertyMap);
-        tazDistanceCalculator.computeTazDistanceArrays();
+        this.tazDistanceCalculator = tazDistanceCalculator;
         
         logsumHelper = new McLogsumsCalculator();
         logsumHelper.setupSkimCalculators(propertyMap);
@@ -156,7 +155,10 @@ public class VisitorTripModeChoiceModel
             int votIndex = uec.lookupVariableIndex("vot");
             double vot = uec.getValueForIndex(votIndex);
             trip.setValueOfTime((float)vot);
-
+           	
+            float parkingCost = getTripParkingCost(mode);
+        	trip.setParkingCost(parkingCost);
+ 
             if(modelStructure.getTripModeIsTransit(mode)){
             	double[][] bestTapPairs = null;
             
@@ -169,7 +171,7 @@ public class VisitorTripModeChoiceModel
             		else
             			bestTapPairs = logsumHelper.getBestWtdTripTaps();
             	}
-            	float rn = new Double(tour.getRandom()).floatValue();
+            	double rn = tour.getRandom();
             	int pathIndex = logsumHelper.chooseTripPath(rn, bestTapPairs, tour.getDebugChoiceModels(), logger);
             	int boardTap = (int) bestTapPairs[pathIndex][0];
             	int alightTap = (int) bestTapPairs[pathIndex][1];
@@ -186,6 +188,26 @@ public class VisitorTripModeChoiceModel
         }
 
     }
+
+    /**
+     * Return parking cost from UEC if auto trip, else return 0.
+     * 
+     * @param tripMode
+     * @return Parking cost if auto mode, else 0
+     */
+    public float getTripParkingCost(int tripMode) {
+    	
+    	float parkingCost=0;
+    	
+    	if(modelStructure.getTripModeIsSovOrHov(tripMode)) {
+     		UtilityExpressionCalculator uec = tripModeChoiceModel.getUEC();
+    		int parkingCostIndex = uec.lookupVariableIndex("parkingCost");
+    		parkingCost = (float) uec.getValueForIndex(parkingCostIndex);
+    		return parkingCost;
+    	}
+    	return parkingCost;
+    }
+    
 
     /**
      * Set DMU attributes.

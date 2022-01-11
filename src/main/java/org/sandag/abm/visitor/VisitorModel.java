@@ -105,7 +105,7 @@ public class VisitorModel
         
  
         VisitorTourTimeOfDayChoiceModel todChoiceModel = new VisitorTourTimeOfDayChoiceModel(rbMap);
-        VisitorTourDestChoiceModel destChoiceModel = new VisitorTourDestChoiceModel(rbMap, modelStructure, dmuFactory);
+        VisitorTourDestChoiceModel destChoiceModel = new VisitorTourDestChoiceModel(rbMap, modelStructure, dmuFactory, tazDistanceCalculator);
         VisitorTourModeChoiceModel tourModeChoiceModel = destChoiceModel.getTourModeChoiceModel();
         //VisitorTripModeChoiceModel tripModeChoiceModel = tourModeChoiceModel.getTripModeChoiceModel();
         destChoiceModel.calculateSizeTerms(dmuFactory);
@@ -115,7 +115,7 @@ public class VisitorModel
         VisitorStopPurposeModel stopPurposeModel = new VisitorStopPurposeModel(rbMap);
         VisitorStopTimeOfDayChoiceModel stopTodChoiceModel = new VisitorStopTimeOfDayChoiceModel(rbMap);
         VisitorStopLocationChoiceModel stopLocationChoiceModel = new VisitorStopLocationChoiceModel(rbMap, modelStructure, dmuFactory, tazDistanceCalculator);
-        VisitorTripModeChoiceModel tripModeChoiceModel = new VisitorTripModeChoiceModel(rbMap, modelStructure, dmuFactory);
+        VisitorTripModeChoiceModel tripModeChoiceModel = new VisitorTripModeChoiceModel(rbMap, modelStructure, dmuFactory, tazDistanceCalculator);
         VisitorMicromobilityChoiceModel micromobilityChoiceModel = new VisitorMicromobilityChoiceModel(rbMap,modelStructure, dmuFactory);
         
         double[][] mgraSizeTerms = destChoiceModel.getMgraSizeTerms();
@@ -380,7 +380,18 @@ public class VisitorModel
      */
     public static void main(String[] args)
     {
-
+        Runtime gfg = Runtime.getRuntime(); 
+        long memory1; 
+        // checking the total memeory 
+        System.out.println("Total memory is: "+ gfg.totalMemory()); 
+        // checking free memory 
+        memory1 = gfg.freeMemory(); 
+        System.out.println("Initial free memory at Visitor model: "+ memory1); 
+        // calling the garbage collector on demand 
+        gfg.gc(); 
+        memory1 = gfg.freeMemory(); 
+        System.out.println("Free memory after garbage "+ "collection: " + memory1); 
+        
         String propertiesFile = null;
         HashMap<String, String> pMap;
 

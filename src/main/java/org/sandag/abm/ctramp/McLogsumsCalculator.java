@@ -41,6 +41,7 @@ public class McLogsumsCalculator implements Serializable
     private BestTransitPathCalculator          bestPathUEC;
     private double[]                           tripModeChoiceSegmentStoredProbabilities;
     private double[]                           tripModeChoiceSegmentStoredVOTs;
+    private float    						   tripModeChoiceSegmentStoredParkingCost;
 
     
     private TazDataManager                     tazManager;
@@ -233,6 +234,8 @@ public class McLogsumsCalculator implements Serializable
         tripModeChoiceSegmentStoredVOTs[1] = uec.getValueForIndex(uec.lookupVariableIndex("votS2"));
         tripModeChoiceSegmentStoredVOTs[2] = uec.getValueForIndex(uec.lookupVariableIndex("votS3"));
          
+        tripModeChoiceSegmentStoredParkingCost = (float) uec.getValueForIndex(uec.lookupVariableIndex("parkingCost"));
+        
         if ( mcDmuObject.getHouseholdObject().getDebugChoiceModels() )
             mcModel.logUECResults(myLogger, "Trip Mode Choice Utility Expressions for mgras: " + origMgra + " to " + destMgra + " for HHID: " + mcDmuIndex.getHHIndex() );
         
@@ -739,8 +742,13 @@ public class McLogsumsCalculator implements Serializable
     }
     
     //select best transit path from N-path for trip
-    public int chooseTripPath(float rnum, double[][] bestTapPairs, boolean myTrace, Logger myLogger) {
-    	return bestPathUEC.chooseTripPath(rnum, bestTapPairs, myTrace, myLogger);
+    public int chooseTripPath(double rnum, double[][] bestTapPairs, boolean myTrace, Logger myLogger) {
+     	return bestPathUEC.chooseTripPath(rnum, bestTapPairs, myTrace, myLogger);
     }
+
+
+	public float getTripModeChoiceSegmentStoredParkingCost() {
+		return tripModeChoiceSegmentStoredParkingCost;
+	}
     
 }

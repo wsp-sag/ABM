@@ -31,6 +31,7 @@ class PropertiesSetter(object):
     useLocalDrive = _m.Attribute(bool)
     skip4Ds = _m.Attribute(bool)
     skipBuildNetwork = _m.Attribute(bool)
+    skipInputChecker = _m.Attribute(bool)
     skipInitialization = _m.Attribute(bool)
     deleteAllMatrices = _m.Attribute(bool)
     skipCopyWarmupTripTables = _m.Attribute(bool)
@@ -45,6 +46,9 @@ class PropertiesSetter(object):
     skipTransitSkimming_1 = _m.Attribute(bool)
     skipTransitSkimming_2 = _m.Attribute(bool)
     skipTransitSkimming_3 = _m.Attribute(bool)
+    skipTransponderExport_1 = _m.Attribute(bool)
+    skipTransponderExport_2 = _m.Attribute(bool)
+    skipTransponderExport_3 = _m.Attribute(bool)
     skipCoreABM_1 = _m.Attribute(bool)
     skipCoreABM_2 = _m.Attribute(bool)
     skipCoreABM_3 = _m.Attribute(bool)
@@ -71,6 +75,7 @@ class PropertiesSetter(object):
     skipTripTableCreation_3 = _m.Attribute(bool)
 
     skipFinalHighwayAssignment = _m.Attribute(bool)
+    skipFinalHighwayAssignmentStochastic = _m.Attribute(bool)
     skipFinalTransitAssignment = _m.Attribute(bool)
     skipVisualizer = _m.Attribute(bool)
     skipDataExport = _m.Attribute(bool)
@@ -94,6 +99,9 @@ class PropertiesSetter(object):
     skipTransitSkimming = property(
         fget=lambda self: self._get_list_prop("skipTransitSkimming"),
         fset=lambda self, value: self._set_list_prop("skipTransitSkimming", value))
+    skipTransponderExport = property(
+        fget=lambda self: self._get_list_prop("skipTransponderExport"),
+        fset=lambda self, value: self._set_list_prop("skipTransponderExport", value))
     skipCoreABM = property(
         fget=lambda self: self._get_list_prop("skipCoreABM"),
         fset=lambda self, value: self._set_list_prop("skipCoreABM", value))
@@ -121,11 +129,11 @@ class PropertiesSetter(object):
 
     def __init__(self):
         self._run_model_names = (
-            "useLocalDrive", "skip4Ds",
+            "useLocalDrive", "skip4Ds", "skipInputChecker",
             "startFromIteration", "skipInitialization", "deleteAllMatrices", "skipCopyWarmupTripTables", 
             "skipCopyBikeLogsum", "skipCopyWalkImpedance", "skipWalkLogsums", "skipBikeLogsums", "skipBuildNetwork", 
-            "skipHighwayAssignment", "skipTransitSkimming", "skipCoreABM", "skipOtherSimulateModel", "skipMAASModel","skipCTM", 
-            "skipEI", "skipExternalExternal", "skipTruck", "skipTripTableCreation", "skipFinalHighwayAssignment", 
+            "skipHighwayAssignment", "skipTransitSkimming", "skipTransponderExport", "skipCoreABM", "skipOtherSimulateModel", "skipMAASModel","skipCTM", 
+            "skipEI", "skipExternalExternal", "skipTruck", "skipTripTableCreation", "skipFinalHighwayAssignment", 'skipFinalHighwayAssignmentStochastic', 
             "skipFinalTransitAssignment", "skipVisualizer", "skipDataExport", "skipDataLoadRequest", 
             "skipDeleteIntermediateFiles")
         self._properties = None
@@ -164,6 +172,7 @@ class PropertiesSetter(object):
             ("useLocalDrive",           "Use the local drive during the model run"),
             ("skip4Ds",                 "Skip running 4Ds"),
             ("skipBuildNetwork",        "Skip build of highway and transit network"),
+            ("skipInputChecker",		"Skip running input checker"),
             ("skipInitialization",      "Skip matrix and transit database initialization"),
             ("deleteAllMatrices",       "&nbsp;&nbsp;&nbsp;&nbsp;Delete all matrices"),
             ("skipCopyWarmupTripTables","Skip import of warmup trip tables"),
@@ -175,6 +184,7 @@ class PropertiesSetter(object):
         skip_per_iteration_items = [
             ("skipHighwayAssignment",   "Skip highway assignments and skims"),
             ("skipTransitSkimming",     "Skip transit skims"),
+            ("skipTransponderExport",   "Skip transponder accessibilities"),
             ("skipCoreABM",             "Skip core ABM"),
             ("skipOtherSimulateModel",  "Skip other simulation model"),
             ("skipMAASModel",           "Skip MAAS model"),
@@ -186,6 +196,7 @@ class PropertiesSetter(object):
         ]
         skip_final_items = [
             ("skipFinalHighwayAssignment",  "Skip final highway assignments"),
+            ("skipFinalHighwayAssignmentStochastic",  "&nbsp;&nbsp;&nbsp;&nbsp;Skip stochastic assignment"),
             ("skipFinalTransitAssignment",  "Skip final transit assignments"),
             ("skipVisualizer",              "Skip running visualizer"),
             ("skipDataExport",              "Skip data export"),
@@ -294,6 +305,7 @@ class PropertiesSetter(object):
         self.useLocalDrive = props.get("RunModel.useLocalDrive", True)
         self.skip4Ds = props.get("RunModel.skip4Ds", False)
         self.skipBuildNetwork = props.get("RunModel.skipBuildNetwork", False)
+        self.skipInputChecker = props.get("RunModel.skipInputChecker", False)
         self.skipInitialization = props.get("RunModel.skipInitialization", False)
         self.deleteAllMatrices = props.get("RunModel.deleteAllMatrices", False)
         self.skipCopyWarmupTripTables = props.get("RunModel.skipCopyWarmupTripTables", False)
@@ -304,6 +316,7 @@ class PropertiesSetter(object):
 
         self.skipHighwayAssignment = props.get("RunModel.skipHighwayAssignment", [False, False, False])
         self.skipTransitSkimming = props.get("RunModel.skipTransitSkimming", [False, False, False])
+        self.skipTransponderExport = props.get("RunModel.skipTransponderExport", [False, False, False])
         self.skipCoreABM = props.get("RunModel.skipCoreABM", [False, False, False])
         self.skipOtherSimulateModel = props.get("RunModel.skipOtherSimulateModel", [False, False, False])
         self.skipMAASModel = props.get("RunModel.skipMAASModel", [False, False, False])
@@ -314,6 +327,7 @@ class PropertiesSetter(object):
         self.skipTripTableCreation = props.get("RunModel.skipTripTableCreation", [False, False, False])
 
         self.skipFinalHighwayAssignment = props.get("RunModel.skipFinalHighwayAssignment", False)
+        self.skipFinalHighwayAssignmentStochastic = props.get("RunModel.skipFinalHighwayAssignmentStochastic", True)
         self.skipFinalTransitAssignment = props.get("RunModel.skipFinalTransitAssignment", False) 
         self.skipVisualizer = props.get("RunModel.skipVisualizer", False)
         self.skipDataExport = props.get("RunModel.skipDataExport", False)
@@ -328,6 +342,7 @@ class PropertiesSetter(object):
         props["RunModel.useLocalDrive"] = self.useLocalDrive
         props["RunModel.skip4Ds"] = self.skip4Ds
         props["RunModel.skipBuildNetwork"] = self.skipBuildNetwork
+        props["RunModel.skipInputChecker"] = self.skipInputChecker
         props["RunModel.skipInitialization"] = self.skipInitialization
         props["RunModel.deleteAllMatrices"] = self.deleteAllMatrices
         props["RunModel.skipCopyWarmupTripTables"] = self.skipCopyWarmupTripTables
@@ -338,6 +353,7 @@ class PropertiesSetter(object):
         
         props["RunModel.skipHighwayAssignment"] = self.skipHighwayAssignment
         props["RunModel.skipTransitSkimming"] = self.skipTransitSkimming
+        props["RunModel.skipTransponderExport"] = self.skipTransponderExport
         props["RunModel.skipCoreABM"] = self.skipCoreABM
         props["RunModel.skipOtherSimulateModel"] = self.skipOtherSimulateModel
         props["RunModel.skipMAASModel"] = self.skipMAASModel
@@ -348,6 +364,7 @@ class PropertiesSetter(object):
         props["RunModel.skipTripTableCreation"] = self.skipTripTableCreation
 
         props["RunModel.skipFinalHighwayAssignment"] = self.skipFinalHighwayAssignment
+        props["RunModel.skipFinalHighwayAssignmentStochastic"] = self.skipFinalHighwayAssignmentStochastic
         props["RunModel.skipFinalTransitAssignment"] = self.skipFinalTransitAssignment
         props["RunModel.skipVisualizer"] = self.skipVisualizer
         props["RunModel.skipDataExport"] = self.skipDataExport
@@ -488,11 +505,11 @@ class Properties(object):
     def save(self, path=None):
         if not path:
             path = self._path
-        # check for possible interference if user edits the 
-        # properties files directly while it is already open in Modeller
-        timestamp = os.path.getmtime(path)
-        if timestamp != self._timestamp:
-            raise Exception("%s file conflict - edited externally after loading" % path)
+            # check for possible interference if user edits the 
+            # properties files directly while it is already open in Modeller
+            timestamp = os.path.getmtime(path)
+            if timestamp != self._timestamp:
+                raise Exception("%s file conflict - edited externally after loading" % path)
         self["SavedFrom"] = "Emme Modeller properties writer Process ID %s" % os.getpid()
         self["SavedLast"] = time.strftime("%b-%d-%Y %H:%M:%S")
         with open(path, 'w') as f:
@@ -514,11 +531,11 @@ class Properties(object):
             reader = csv.DictReader(f)
             properties_by_year = {}
             for row in reader:
-                year = int(row.pop("year"))
+                year = str(row.pop("year"))
                 properties_by_year[year] = row
-        year_properties = properties_by_year.get(self["scenarioYear"])
+        year_properties = properties_by_year.get(str(self["scenarioBuild"]))
         if year_properties is None:
-            raise Exception("Row with year %s not found in %s" % (self["scenarioYear"], file_path))
+            raise Exception("Row with year %s not found in %s" % (self["scenarioBuild"], file_path))
         self.update(year_properties)
 
     def __setitem__(self, key, item): 

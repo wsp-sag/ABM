@@ -1,7 +1,5 @@
 __author__ = 'wsu'
 #Wu.Sun@sandag.org 10-27-2016
-#wsu update 9/24/2018 for release 14.0.1
-#wsu update 1/30/2019 for release 14.1.0
 import Tkinter
 import Tkconstants
 import tkFileDialog
@@ -20,7 +18,7 @@ class CreateScenarioGUI(Tkinter.Frame):
 
             #divider line
             divider=u"_"*120
-            self.releaseDir='T:\\ABM\\release_test\\ABM'
+            self.releaseDir='T:\\ABM\\release\\ABM'
             self.defaultScenarioDir="T:\\projects\\sr14"
             self.defaultNetworkDir="T:\\projects\\sr14\\version14_2_0\\network_build"
 
@@ -56,16 +54,16 @@ class CreateScenarioGUI(Tkinter.Frame):
 
             Tkinter.Label(body, text=u"Version", font=("Helvetica", 8, 'bold')).grid(row=8)
             var = StringVar(root)
-            self.version="version_14_2_0"
-            optionList=["version_14_2_0"]
+            self.version="version_14_2_2"
+            optionList=["version_14_2_2"]
             option=Tkinter.OptionMenu(body,var,*optionList,command=self.setversion)
             option.config(width=50)
             option.grid(row=8, column=1)
 
             Tkinter.Label(body, text=u"Emme Version", font=("Helvetica", 8, 'bold')).grid(row=9)
             var = StringVar(root)
-            self.emme_version = "4.4.2"
-            optionList = ["4.3.7", "4.4.2"]
+            self.emme_version = "4.4.4.1"
+            optionList = ["4.3.7", "4.4.4.1"]
             option = Tkinter.OptionMenu(body, var, *optionList, command=self.setEmmeVersion)
             option.config(width=50)
             option.grid(row=9, column=1)
@@ -74,7 +72,7 @@ class CreateScenarioGUI(Tkinter.Frame):
 
             var = StringVar(root)
             self.year="2016"
-            yearOptionList = ["2016", "2020", "2025", "2025nb", "2035", "2035nb", "2050","2050nb"]
+            yearOptionList = ["2016", "2020", "2023", "2025", "2025nb", "2026", "2029", "2030", "2030nb", "2032", "2035", "2035nb", "2040", "2040nb", "2050","2050nb"]
             option=Tkinter.OptionMenu(body,var,*yearOptionList,command=self.setyear)
             option.config(width=50)
             option.grid(row=10, column=1)
@@ -211,23 +209,15 @@ class CreateScenarioGUI(Tkinter.Frame):
         def executeBatch(self, type):
             self.popup.destroy()
             if type=="scenario":
-                if self.year=="2035nb":
-                   commandstr = u"create_scenario.cmd %s %s %s %s" % (
-                       self.scenariopath.get(),
-                       self.year,
-                       self.networkpath.get().rstrip("nb"),
-                       self.emme_version
-                   )
-                else:
-                    commandstr = u"create_scenario.cmd %s %s %s %s" % (
-                        self.scenariopath.get(),
-                        self.year,
-                        self.networkpath.get(),
-                        self.emme_version
-                    )
+                commandstr = u"create_scenario.cmd %s %s %s %s" % (
+                    self.scenariopath.get(),
+                    self.year,
+                    self.networkpath.get(),
+                    self.emme_version
+                )
             elif type=="study":
                 commandstr=u"copy_networkfiles_to_study.cmd "+self.studypath.get()+" "+self.studynetworkpath.get()
-            print commandstr
+            print (commandstr)
             os.chdir(self.releaseDir+"\\"+self.version+'\\')
             os.system(commandstr)
             self.popup=Tkinter.Tk()

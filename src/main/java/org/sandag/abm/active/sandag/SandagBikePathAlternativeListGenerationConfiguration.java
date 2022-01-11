@@ -29,7 +29,6 @@ public abstract class SandagBikePathAlternativeListGenerationConfiguration
     public static final String                                             PROPERTIES_COEF_DWRONGWY          = "active.coef.dwrongwy";
     public static final String                                             PROPERTIES_COEF_GAIN              = "active.coef.gain";
     public static final String                                             PROPERTIES_COEF_TURN              = "active.coef.turn";
-    public static final String                                             PROPERTIES_COEF_DISTANCE_WALK     = "active.coef.distance.walk";
     public static final String                                             PROPERTIES_COEF_GAIN_WALK         = "active.coef.gain.walk";
     public static final String                                             PROPERTIES_COEF_DCYCTRAC          = "active.coef.dcyctrac";
     public static final String                                             PROPERTIES_COEF_DBIKBLVD          = "active.coef.dbikblvd";
@@ -57,7 +56,7 @@ public abstract class SandagBikePathAlternativeListGenerationConfiguration
     
     protected final String                                                 PROPERTIES_TRACE_OUTPUTASSIGNMENTPATHS       = "active.trace.outputassignmentpaths";
 
-    protected String                                                       PROPERTIES_MAXDIST_ZONE;
+    protected double                                                       PROPERTIES_MAXDIST_ZONE;
     protected String                                                       PROPERTIES_TRACE_ORIGINS;
 
     protected Map<Integer, Map<Integer, Double>>                           nearbyZonalDistanceMap;
@@ -235,7 +234,7 @@ public abstract class SandagBikePathAlternativeListGenerationConfiguration
             }
             System.out.println("Calculating nearby Zonal Distance Map");
             ShortestPathResultSet<SandagBikeNode> resultSet = sps.getShortestPaths(originNodes,
-                    destinationNodes, Double.parseDouble(propertyMap.get(PROPERTIES_MAXDIST_ZONE)));
+                    destinationNodes, PROPERTIES_MAXDIST_ZONE);
             int originZone, destinationZone;
             for (NodePair<SandagBikeNode> odPair : resultSet)
             {

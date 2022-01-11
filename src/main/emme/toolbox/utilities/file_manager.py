@@ -222,7 +222,12 @@ class FileManagerTool(_m.Tool(), gen_utils.Snapshot):
                     except:
                         pass
                 elif os.path.isdir(path):
-                    _shutil.rmtree(path, ignore_errors=True)
+                    try:
+                        _shutil.rmtree(path, ignore_errors=False)
+                    except:
+                        pass
+
+            _shutil.rmtree(local_dir, ignore_errors=False)
 
     def _copy_emme_data(self, src, dst, title_fcn, scenario_id, initialize=False):
         # copy data from Database and Database_transit using API and import tool
@@ -331,18 +336,16 @@ class FileManagerTool(_m.Tool(), gen_utils.Snapshot):
                 # shutil.copy2 performs 5-10 times faster on download, and ~20% faster on upload
                 # than os.system copy calls
                 src_time = os.path.getmtime(src_path)
-                if name == 'persons.csv':
+                if name == 'persons.csv' or "mgra13_based" in name:
                     src_time = os.path.getmtime(src_path)
                     if os.path.exists(dst_path):
                         dest_time = os.path.getmtime(dst_path)
                         if dest_time <= src_time:
                             _shutil.copy2(src_path, dst_path)
-                            print "dest_time <= ori_time, copied, dst_path", dst_path
                         else:
-                            print "dest_time > ori_time, not copied, dst_path", dst_path
+                            pass
                     else:
                         _shutil.copy2(src_path, dst_path)
-                        print "dest file not exist, copied"
                 else:
                     _shutil.copy2(src_path, dst_path)
                 self._report.append(_time.strftime("%c"))

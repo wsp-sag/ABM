@@ -214,7 +214,9 @@ public class IntermediateStopChoiceModels
     
     private double[][]                         mcVOTsSegmentIk; //by sample and occupancy (0=non-SR,1=S2,2=S3)
     private double[][]                         mcVOTsSegmentKj;
-    
+  
+    private float[]								parkingCostSegmentIk; //by sample
+    private float[]								parkingCostSegmentKj;
 
     private double[][][][] segmentIkBestTapPairs;
     private double[][][][] segmentKjBestTapPairs;
@@ -453,6 +455,10 @@ public class IntermediateStopChoiceModels
         //declare the arrays for storing the VOTs calculated by trip mode choice for ik and kj segment
         mcVOTsSegmentIk = new double[sampleSize+1][3];
         mcVOTsSegmentKj = new double[sampleSize+1][3];
+        
+        //declare arrays for storing the trip mode choice parking cost for ik and kj segment
+        parkingCostSegmentIk = new float[sampleSize+1];
+        parkingCostSegmentKj = new float[sampleSize+1];
 
         //declare the arrays for storing the stop location choice ik and kj segment
         //mode choice logsum arrays
@@ -1130,6 +1136,9 @@ public class IntermediateStopChoiceModels
                             park = selectParkingLocation(household, tour, stop);
                             stop.setPark(park);
                             if (park > 0) lastDest = park;
+                            float parkingCost = parkingCostSegmentIk[selectedIndex];
+                            stop.setParkingCost(parkingCost);
+                            
                         }
 
                     } catch (Exception e)
@@ -1174,7 +1183,7 @@ public class IntermediateStopChoiceModels
 	                    else {
 	                        
                         	//pick transit path from N-paths
-                        	float rn = (float)household.getHhRandom().nextDouble();
+                        	double rn = household.getHhRandom().nextDouble();
                         	int pathindex = logsumHelper.chooseTripPath(rn, segmentIkBestTapPairs[selectedIndex][accEgr], household.getDebugChoiceModels(), smcLogger);
                         	
                             stop.setBoardTap( (int)segmentIkBestTapPairs[selectedIndex][accEgr][pathindex][0] );
@@ -1240,6 +1249,10 @@ public class IntermediateStopChoiceModels
                         vot = mcVOTsSegmentKj[oldSelectedIndex][0];
                    }
 
+                    if (modelStructure.getTripModeIsSovOrHov(modeAlt)) {
+                    	float parkingCost = parkingCostSegmentKj[oldSelectedIndex];
+                    	stop.setParkingCost(parkingCost);
+                    }
                     // last stop on tour, so if inbound, only need park location
                     // choice if tour is work-based subtour;
                     // otherwise dest is home.
@@ -1490,8 +1503,21 @@ public class IntermediateStopChoiceModels
                         check = System.nanoTime();
 
                         selectedIndex = selectDestinationWithTiming(stop,departPeriodToStop,departPeriodFromStop);
-                        choice = finalSample[selectedIndex];
-                        stop.setDest(choice);
+                        //close small probability logical hole, reset stop destination as intrazonal stop,  log out reset cases
+                        if(selectedIndex<0) {
+                        	selectedIndex=0;
+                        	choice=origMgra;
+                        	stop.setDest(choice);
+                        	modeAlt=tour.getTourModeChoice();
+                        	modeLogsum=0;
+                        	logger.warn("Stop ID"+stop.id+" :destination set as intrazonal stop");
+                        }else {
+                        	choice = finalSample[selectedIndex];
+                        	stop.setDest(choice);
+                            modeAlt = selectModeFromProbabilities(stop,
+                                    mcCumProbsSegmentIk[selectedIndex]);
+                            modeLogsum = (float) mcLogsumsSegmentIk[selectedIndex];
+                        }
 
                         if (sampleMgraInAlightingTapShed[choice])
                             earlierTripWasLocatedInAlightingTapShed = true;
@@ -1538,9 +1564,11 @@ public class IntermediateStopChoiceModels
                         }
 
                         check = System.nanoTime();
+                        /*
                         modeAlt = selectModeFromProbabilities(stop,
                                 mcCumProbsSegmentIk[selectedIndex]);
                         modeLogsum = (float) mcLogsumsSegmentIk[selectedIndex];
+                        */
 
                         if (modeAlt < 0)
                         {
@@ -1573,6 +1601,9 @@ public class IntermediateStopChoiceModels
                             park = selectParkingLocation(household, tour, stop);
                             stop.setPark(park);
                             if (park > 0) lastDest = park;
+                            float parkingCost = parkingCostSegmentIk[selectedIndex];
+                            stop.setParkingCost(parkingCost);
+ 
                         }
 
                         smcTime += (System.nanoTime() - check);
@@ -1626,7 +1657,7 @@ public class IntermediateStopChoiceModels
 	                    else {
 	                    	
 	                    	//pick transit path from N-paths
-                        	float rn = (float)household.getHhRandom().nextDouble();
+                        	double rn = household.getHhRandom().nextDouble();
                         	int pathindex = logsumHelper.chooseTripPath(rn, segmentIkBestTapPairs[selectedIndex][accEgr], household.getDebugChoiceModels(), smcLogger);
                         	
                             stop.setBoardTap( (int)segmentIkBestTapPairs[selectedIndex][accEgr][pathindex][0] );
@@ -1683,9 +1714,16 @@ public class IntermediateStopChoiceModels
                     	}
                     }
                     check = System.nanoTime();
-                    modeAlt = selectModeFromProbabilities(stop,
-                            mcCumProbsSegmentKj[oldSelectedIndex]);
-                    modeLogsum = (float) mcLogsumsSegmentKj[oldSelectedIndex];
+                    //Wu added
+                    if(mcCumProbsSegmentKj[oldSelectedIndex]!=null&&mcLogsumsSegmentKj!=null) {
+	                    modeAlt = selectModeFromProbabilities(stop,
+	                            mcCumProbsSegmentKj[oldSelectedIndex]);
+	                    modeLogsum = (float) mcLogsumsSegmentKj[oldSelectedIndex];
+                    }else {
+	                    modeAlt = tour.getTourModeChoice();
+	                    modeLogsum = 0; 
+	                    logger.warn("Stop ID"+stop.id+" :mode and mode logsum reset.");
+                    }
 
                     if (modeAlt < 0)
                     {
@@ -1711,6 +1749,11 @@ public class IntermediateStopChoiceModels
                         vot = mcVOTsSegmentKj[oldSelectedIndex][0];
                    }
 
+
+                    if (modelStructure.getTripModeIsSovOrHov(modeAlt)) {
+                    	float parkingCost = parkingCostSegmentKj[oldSelectedIndex];
+                    	stop.setParkingCost(parkingCost);
+                    }
                     // last stop on tour, so if inbound, only need park location
                     // choice if tour is work-based subtour;
                     // otherwise dest is home.
@@ -2845,7 +2888,8 @@ public class IntermediateStopChoiceModels
 
             // store the mode choice probabilities for the segment
             mcCumProbsSegmentIk[i] = logsumHelper.getStoredSegmentCumulativeProbabilities();
-            mcVOTsSegmentIk[i] = logsumHelper.getStoredSegmentVOTs(); 
+            mcVOTsSegmentIk[i] = logsumHelper.getStoredSegmentVOTs();
+            parkingCostSegmentIk[i] = logsumHelper.getTripModeChoiceSegmentStoredParkingCost();
             
             // Store the mode choice logsum for the segment
             mcLogsumsSegmentIk[i] = ikSegment;
@@ -2979,7 +3023,8 @@ public class IntermediateStopChoiceModels
             // store the mode choice probabilities for the segment
             mcCumProbsSegmentKj[i] = logsumHelper.getStoredSegmentCumulativeProbabilities();
             mcVOTsSegmentKj[i] = logsumHelper.getStoredSegmentVOTs();
-          
+            parkingCostSegmentKj[i] = logsumHelper.getTripModeChoiceSegmentStoredParkingCost();
+            
             // store the mode choice logsum for the segment
             mcLogsumsSegmentKj[i] = kjSegment;
 
