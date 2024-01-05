@@ -10,16 +10,18 @@ for period in ['EA', 'AM', 'MD', 'PM', 'EV']:
     
     print("Working on setting zone mapping for cv trips_%s.omx" %(period))
     # check if the old file exists, if so, delete it
-    if os.path.exists(output_dir + "/%s/trips_%s_.omx" % (model_name, period)):
-        os.remove(output_dir + "/%s/trips_%s_.omx" % (model_name, period))
+    #if os.path.exists(output_dir + "/%s/%strips_%s_.omx" % (model_name, model_name, period)):
+        #os.remove(output_dir + "/%s/%strips_%s_.omx" % (model_name, model_name, period))
     # rename the file
-    os.rename(output_dir + "/%s/trips_%s.omx" % (model_name, period), output_dir + "/%s/trips_%s_.omx" % (model_name, period))
-    trip_table_old = omx.open_file(output_dir + "/%s/trips_%s_.omx" % (model_name, period), 'r')
-    trip_table = omx.open_file(output_dir + "/%s/trips_%s.omx" % (model_name, period), 'w')
+    os.rename(output_dir + "/%s/%strips_%s.omx" % (model_name, model_name, period), output_dir + "/%s/%strips_%s_.omx" % (model_name, model_name, period))
+    trip_table_old = omx.open_file(output_dir + "/%s/%strips_%s_.omx" % (model_name, model_name, period), 'r')
+    trip_table = omx.open_file(output_dir + "/%s/%strips_%s.omx" % (model_name, model_name, period), 'w')
 
     for core in trip_table_old.list_matrices():
+        print("core is " + core)
 
         mapping_name = trip_table_old.list_mappings()[0]
+        print("mapping_name is " + mapping_name)
         zone_mapping = trip_table_old.mapping(mapping_name)
         zones = list(zone_mapping.keys())
         zones_sorted = sorted(zones)

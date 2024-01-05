@@ -14,7 +14,7 @@ EST_EXPANSION_WEIGHT_COL: sample_rate  # added when establishments rPMd in
 SAVE_TRIPS_TABLE: False
 
 MATRICES:
-  - file_name: trips_ea.omx
+  - file_name: CVMtrips_ea.omx
     tables:
       - name: CAR_EA
         data_field: CAR_EA
@@ -22,9 +22,9 @@ MATRICES:
         data_field:  LIGHT_TRUCK_EA
       - name: MEDIUM_TRUCK_EA
         data_field: MEDIUM_TRUCK_EA
-      - name: HEAVY_TRUCK_EA
-        data_field: HEAVY_TRUCK_EA
-  - file_name: trips_am.omx
+      #- name: HEAVY_TRUCK_EA
+      #  data_field: HEAVY_TRUCK_EA
+  - file_name: CVMtrips_am.omx
     tables:
       - name: CAR_AM
         data_field: CAR_AM
@@ -32,9 +32,9 @@ MATRICES:
         data_field:  LIGHT_TRUCK_AM
       - name: MEDIUM_TRUCK_AM
         data_field: MEDIUM_TRUCK_AM
-      - name: HEAVY_TRUCK_AM
-        data_field: HEAVY_TRUCK_AM
-  - file_name: trips_md.omx
+      #- name: HEAVY_TRUCK_AM
+      #  data_field: HEAVY_TRUCK_AM
+  - file_name: CVMtrips_md.omx
     tables:
       - name: CAR_MD
         data_field: CAR_MD
@@ -42,9 +42,9 @@ MATRICES:
         data_field:  LIGHT_TRUCK_MD
       - name: MEDIUM_TRUCK_MD
         data_field: MEDIUM_TRUCK_MD
-      - name: HEAVY_TRUCK_MD
-        data_field: HEAVY_TRUCK_MD
-  - file_name: trips_pm.omx
+      #- name: HEAVY_TRUCK_MD
+      #  data_field: HEAVY_TRUCK_MD
+  - file_name: CVMtrips_pm.omx
     tables:
       - name: CAR_PM
         data_field: CAR_PM
@@ -52,9 +52,9 @@ MATRICES:
         data_field:  LIGHT_TRUCK_PM
       - name: MEDIUM_TRUCK_PM
         data_field: MEDIUM_TRUCK_PM
-      - name: HEAVY_TRUCK_PM
-        data_field: HEAVY_TRUCK_PM
-  - file_name: trips_ev.omx
+      #- name: HEAVY_TRUCK_PM
+      #  data_field: HEAVY_TRUCK_PM
+  - file_name: CVMtrips_ev.omx
     tables:
       - name: CAR_EV
         data_field: CAR_EV
@@ -62,8 +62,8 @@ MATRICES:
         data_field:  LIGHT_TRUCK_EV
       - name: MEDIUM_TRUCK_EV
         data_field: MEDIUM_TRUCK_EV
-      - name: HEAVY_TRUCK_EV
-        data_field: HEAVY_TRUCK_EV
+      #- name: HEAVY_TRUCK_EV
+      #  data_field: HEAVY_TRUCK_EV
 
 CONSTANTS:
   time_periods:

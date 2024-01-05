@@ -1,7 +1,8 @@
 households_sample_size: 0
-establishments_sample_size: 50
+establishments_sample_size: 0
 trace_establishment_id:
 trace_hh_id: 479044
+#resume_after:
 
 inherit_settings: True
 chunk_size: 0
@@ -35,6 +36,7 @@ input_table_list:
     index_col: zone_id
     rename_columns:
       MAZ: zone_id
+      #emp_retail: emp_ret
     drop_columns:
       - i1
       - i2
