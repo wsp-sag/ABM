@@ -49,6 +49,9 @@ class StopLoopPurposeSettings(LogitComponentSettings, extra="forbid"):
     the stop loop exits.
     """
 
+    preprocessor: PreprocessorSettings | None = None
+    """Preprocessor settings for this model."""
+
 
 class StopLoopLocationSettings(SimpleLocationComponentSettings, extra="forbid"):
     TERMINAL_ZONE_COL_NAME: str = "terminal_zone"
@@ -236,6 +239,11 @@ def _stop_purpose(
 
     nest_spec = config.get_logit_model_settings(model_settings)
 
+    # this needs to happen before we choose the next purpose
+    nonterminated_routes[model_settings.PRIOR_PURP_COL] = nonterminated_routes[
+        model_settings.NEXT_PURP_COL
+    ]
+
     # if estimator:
     #     estimator.write_model_settings(model_settings, model_settings_file_name)
     #     estimator.write_spec(file_name=model_settings.SPEC)
@@ -269,9 +277,6 @@ def _stop_purpose(
     #     estimator.write_override_choices(choices)
     #     estimator.end_estimation()
 
-    nonterminated_routes[model_settings.PRIOR_PURP_COL] = nonterminated_routes[
-        model_settings.NEXT_PURP_COL
-    ]
     nonterminated_routes[model_settings.NEXT_PURP_COL] = (
         choices.reindex(nonterminated_routes.index)
         .fillna(model_spec.columns[0])
