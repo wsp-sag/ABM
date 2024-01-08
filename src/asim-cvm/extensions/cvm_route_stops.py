@@ -300,99 +300,252 @@ def _route_stop_location(
 
     size_term_calculator = SizeTermCalculator(state, model_settings.SIZE_TERM_SELECTOR)
 
+    # build alternatives table, alternatives are MAZs
+    maz_df = state.get_table("land_use")
+    # keep subset columns
+    maz_df = maz_df[["TAZ","hh","emp_whsle_whs","emp_total"]]
+
+    # add is_port column
+    port_taz = [
+        2086, 
+        1154, 
+        2497, 
+        2193, 
+        1294, 
+        1338, 
+        1457, 
+        1476, 
+        1485, 
+        1520, 
+        4184, 
+        4435, 
+        4582, 
+        4853, 
+        2050, 
+        3742,
+    ]
+    maz_df["is_port"] = maz_df.TAZ.isin(port_taz)
+
+    # select viable alternatives
+    alt_residence = maz_df[maz_df.hh > 0].index
+    alt_warehouse = maz_df[maz_df.emp_whsle_whs > 0].index
+    alt_port = maz_df[maz_df.is_port].index
+    alt_commerce = maz_df[maz_df.emp_total > 0].index
+
+    altcode_residence = alt_residence * 10 + 1
+    altcode_warehouse = alt_warehouse * 10 + 2
+    altcode_port = alt_port * 10 + 3
+    altcode_commerce = alt_commerce * 10 + 4
+
+    alt_mazs = np.concatenate([alt_residence, alt_warehouse, alt_port, alt_commerce])
+    altcodes = np.concatenate([altcode_residence, altcode_warehouse, altcode_port, altcode_commerce])
+
+    alt_segments = {
+        "residence": [str(z) for z in range(0,len(alt_residence))],
+        "warehouse": [str(z) for z in range(len(alt_residence),len(alt_residence)+len(alt_warehouse))],
+        "port": [str(z) for z in range(len(alt_residence)+len(alt_warehouse),len(alt_residence)+len(alt_warehouse)+len(alt_port))],
+        "commerce": [str(z) for z in range(len(alt_residence)+len(alt_warehouse)+len(alt_port),len(alt_mazs))],
+    }
+
+    alt_df = pd.DataFrame({
+        "alt_index": range(0,len(alt_mazs)), # need to start from 0 and consecutive
+        "alt": alt_mazs,
+        "altcode": altcodes,
+        "hh": maz_df.loc[alt_mazs, "hh"],
+        "emp_whsle_whs": maz_df.loc[alt_mazs, "emp_whsle_whs"],
+        "is_port": maz_df.loc[alt_mazs, "is_port"],
+        "emp_total": maz_df.loc[alt_mazs, "emp_total"],
+    })
+
+    alt_df["alt_index"] = alt_df["alt_index"].astype(str)
+    alt_df = alt_df.set_index("alt_index")
+        
+    # build nest spec
+    nest_spec = model_settings.NESTS
+    nest_spec["alternatives"] = []
+
+    for segment_name in ["residence", "warehouse", "port", "commerce"]:
+        if segment_name == "base":
+            continue
+        nest_spec["alternatives"] += [{
+            "name": segment_name,
+            "coefficient": "0.6",
+            "alternatives": alt_segments[segment_name]
+        }]
+
     # maps segment names to compact (integer) ids
     segments = model_settings.SEGMENTS
 
     chooser_segment_column = model_settings.CHOOSER_SEGMENT_COLUMN_NAME
 
     choices_list = []
-    for segment_name in segments:
-        segment_trace_label = tracing.extend_trace_label(trace_label, segment_name)
 
-        if chooser_segment_column is not None:
-            choosers = all_choosers[
-                all_choosers[chooser_segment_column] == segment_name
-            ]
-        else:
-            choosers = all_choosers
-
-        if len(choosers) == 0:
-            continue
-
-        if segment_name == "base":
-            # there is no terminal choice to make, the terminal location is establishment MAZ
-            choices_list.append(
-                pd.Series(
-                    name=model_settings.RESULT_COL_NAME,
-                    data=choosers["zone_id"],
-                    index=choosers.index,
-                )
-            )
-            continue
-
-        # Note: size_term_calculator omits zones with impossible alternatives
-        # (where dest size term is zero)
-        segment_destination_size_terms = size_term_calculator.dest_size_terms_df(
-            segment_name, segment_trace_label
+    # if the next stop purpose is base, the next stop location is the establishment MAZ
+    choosers_base_purpose = all_choosers[
+        all_choosers["next_stop_purpose"] == "base"
+    ]
+    choices_list.append(
+        pd.Series(
+            name=model_settings.RESULT_COL_NAME,
+            data=choosers_base_purpose["zone_id"],
+            index=choosers_base_purpose.index,
         )
-        spec = simulate.spec_for_segment(
-            state,
-            None,
-            spec_id="SPEC",
-            segment_name=segment_name,
-            estimator=None,
-            spec_file_name=model_settings.SPEC,
-            coefficients_file_name=model_settings.COEFFICIENTS,
-        )
-        pseudo_sample_size = 1  # not really sampling, we are choosing
-        locals_dict = model_settings.CONSTANTS.copy()
-        locals_dict.update(
-            {
-                # "size_terms": size_term_matrix,
-                # "size_terms_array": size_term_matrix.df.to_numpy(),
-                "timeframe": "timeless",
-            }
-        )  # FIXME use timed skims
+    )
 
-        skim_dict = network_los.get_default_skim_dict()
-        skims = {
-            "skims": skim_dict.wrap("zone_id", "zone_id"),
-            "leg1_skims": skim_dict.wrap_3d(
-                orig_key="_prior_stop_location_",
-                dest_key="zone_id",
-                dim3_key="_time_period_",
-            ),
-            "leg2_skims": skim_dict.wrap_3d(
-                orig_key="zone_id",
-                dest_key=model_settings.TERMINAL_ZONE_COL_NAME,
-                dim3_key="_time_period_",
-            ),
-            "hypotenuse_skims": skim_dict.wrap_3d(
-                orig_key="_prior_stop_location_",
-                dest_key=model_settings.TERMINAL_ZONE_COL_NAME,
-                dim3_key="_time_period_",
-            ),
+    # if the next stop purpurpose is not base, we need to choose a location
+    choosers_non_base_purpose = all_choosers[
+        all_choosers["next_stop_purpose"] != "base"
+    ]
+    model_spec = state.filesystem.read_model_spec(file_name=model_settings.SPEC)
+    coefficients_df = state.filesystem.read_model_coefficients(model_settings)
+    model_spec = simulate.eval_coefficients(
+        state, model_spec, coefficients_df, None
+    )
+
+    pseudo_sample_size = 1  # not really sampling, we are choosing
+    locals_dict = model_settings.CONSTANTS.copy()
+    locals_dict.update(
+        {
+            # "size_terms": size_term_matrix,
+            # "size_terms_array": size_term_matrix.df.to_numpy(),
+            "timeframe": "timeless",
         }
+    )  # FIXME use timed skims
 
-        locals_dict.update(skims)
+    skim_dict = network_los.get_default_skim_dict()
+    skims = {
+        "skims": skim_dict.wrap("zone_id", "zone_id"),
+        "leg1_skims": skim_dict.wrap_3d(
+            orig_key="_prior_stop_location_",
+            dest_key="zone_id",
+            dim3_key="_time_period_",
+        ),
+        "leg2_skims": skim_dict.wrap_3d(
+            orig_key="zone_id",
+            dest_key=model_settings.TERMINAL_ZONE_COL_NAME,
+            dim3_key="_time_period_",
+        ),
+        "hypotenuse_skims": skim_dict.wrap_3d(
+            orig_key="_prior_stop_location_",
+            dest_key=model_settings.TERMINAL_ZONE_COL_NAME,
+            dim3_key="_time_period_",
+        ),
+    }
 
-        choices = interaction_sample(
-            state,
-            choosers,
-            segment_destination_size_terms,
-            spec,
-            pseudo_sample_size,
-            alt_col_name=model_settings.RESULT_COL_NAME,
-            allow_zero_probs=False,
-            log_alt_losers=False,
-            skims=skims,
-            locals_d=locals_dict,
-            chunk_size=0,
-            chunk_tag=None,
-            trace_label=trace_label,
-            zone_layer=None,
-        )
-        choices_list.append(choices[model_settings.RESULT_COL_NAME])
+    locals_dict.update(skims)
+
+    choices = interaction_sample(
+        state,
+        choosers_non_base_purpose,
+        alt_df,
+        model_spec,
+        pseudo_sample_size,
+        alt_col_name=model_settings.RESULT_COL_NAME,
+        allow_zero_probs=False,
+        log_alt_losers=False,
+        skims=skims,
+        locals_d=locals_dict,
+        chunk_size=0,
+        chunk_tag=None,
+        trace_label=trace_label,
+        zone_layer=None,
+        nest_spec=nest_spec,
+    )
+
+    # get the alternative codes for the chosen alternatives
+    choices_altcode = alt_df.loc[choices[model_settings.RESULT_COL_NAME], "altcode"]
+    choices_alt = alt_df.loc[choices[model_settings.RESULT_COL_NAME], "alt"]
+
+    choices_list.append(choices_alt)
+
+    # for segment_name in segments:
+    #     segment_trace_label = tracing.extend_trace_label(trace_label, segment_name)
+
+    #     if chooser_segment_column is not None:
+    #         choosers = all_choosers[
+    #             all_choosers[chooser_segment_column] == segment_name
+    #         ]
+    #     else:
+    #         choosers = all_choosers
+
+    #     if len(choosers) == 0:
+    #         continue
+
+    #     if segment_name == "base":
+    #         # there is no terminal choice to make, the terminal location is establishment MAZ
+    #         choices_list.append(
+    #             pd.Series(
+    #                 name=model_settings.RESULT_COL_NAME,
+    #                 data=choosers["zone_id"],
+    #                 index=choosers.index,
+    #             )
+    #         )
+    #         continue
+
+    #     # Note: size_term_calculator omits zones with impossible alternatives
+    #     # (where dest size term is zero)
+    #     segment_destination_size_terms = size_term_calculator.dest_size_terms_df(
+    #         segment_name, segment_trace_label
+    #     )
+    #     spec = simulate.spec_for_segment(
+    #         state,
+    #         None,
+    #         spec_id="SPEC",
+    #         segment_name=segment_name,
+    #         estimator=None,
+    #         spec_file_name=model_settings.SPEC,
+    #         coefficients_file_name=model_settings.COEFFICIENTS,
+    #     )
+    #     pseudo_sample_size = 1  # not really sampling, we are choosing
+    #     locals_dict = model_settings.CONSTANTS.copy()
+    #     locals_dict.update(
+    #         {
+    #             # "size_terms": size_term_matrix,
+    #             # "size_terms_array": size_term_matrix.df.to_numpy(),
+    #             "timeframe": "timeless",
+    #         }
+    #     )  # FIXME use timed skims
+
+    #     skim_dict = network_los.get_default_skim_dict()
+    #     skims = {
+    #         "skims": skim_dict.wrap("zone_id", "zone_id"),
+    #         "leg1_skims": skim_dict.wrap_3d(
+    #             orig_key="_prior_stop_location_",
+    #             dest_key="zone_id",
+    #             dim3_key="_time_period_",
+    #         ),
+    #         "leg2_skims": skim_dict.wrap_3d(
+    #             orig_key="zone_id",
+    #             dest_key=model_settings.TERMINAL_ZONE_COL_NAME,
+    #             dim3_key="_time_period_",
+    #         ),
+    #         "hypotenuse_skims": skim_dict.wrap_3d(
+    #             orig_key="_prior_stop_location_",
+    #             dest_key=model_settings.TERMINAL_ZONE_COL_NAME,
+    #             dim3_key="_time_period_",
+    #         ),
+    #     }
+
+    #     locals_dict.update(skims)
+
+    #     choices = interaction_sample(
+    #         state,
+    #         choosers,
+    #         segment_destination_size_terms,
+    #         spec,
+    #         pseudo_sample_size,
+    #         alt_col_name=model_settings.RESULT_COL_NAME,
+    #         allow_zero_probs=False,
+    #         log_alt_losers=False,
+    #         skims=skims,
+    #         locals_d=locals_dict,
+    #         chunk_size=0,
+    #         chunk_tag=None,
+    #         trace_label=trace_label,
+    #         zone_layer=None,
+    #         nest_spec=nest_spec,
+    #     )
+    #     choices_list.append(choices[model_settings.RESULT_COL_NAME])
 
     if len(choices_list) > 0:
         choices_df = pd.concat(choices_list)
